@@ -11,6 +11,7 @@ interface EndpointTesterProps {
 
 export function EndpointTester({ projectId, method, path, requiresKey }: EndpointTesterProps) {
   const [apiKey, setApiKey] = useState('')
+  const [requestBody, setRequestBody] = useState('')
   const [response, setResponse] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -18,7 +19,9 @@ export function EndpointTester({ projectId, method, path, requiresKey }: Endpoin
     ? `${window.location.origin}/api/mock/${projectId}`
     : `/api/mock/${projectId}`
 
-  const fullUrl = `${baseUrl}${path}`
+  // Ensure path starts with a slash
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const fullUrl = `${baseUrl}${normalizedPath}`
 
   const testEndpoint = async () => {
     setIsLoading(true)
@@ -30,10 +33,19 @@ export function EndpointTester({ projectId, method, path, requiresKey }: Endpoin
         headers['x-api-key'] = apiKey
       }
 
-      const res = await fetch(fullUrl, {
+      // Prepare fetch options
+      const fetchOptions: RequestInit = {
         method,
         headers,
-      })
+      }
+
+      // Add body for POST/PUT/PATCH/DELETE if provided
+      if (requestBody && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+        headers['Content-Type'] = 'application/json'
+        fetchOptions.body = requestBody
+      }
+
+      const res = await fetch(fullUrl, fetchOptions)
 
       const contentType = res.headers.get('content-type')
       let data
@@ -80,6 +92,22 @@ export function EndpointTester({ projectId, method, path, requiresKey }: Endpoin
               placeholder="Enter your API key"
               className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
             />
+          </div>
+        )}
+
+        {['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && (
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">Request Body (JSON)</label>
+            <textarea
+              value={requestBody}
+              onChange={(e) => setRequestBody(e.target.value)}
+              placeholder='{"key": "value"}'
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Optional: Enter JSON data to send with the request
+            </p>
           </div>
         )}
 

@@ -93,6 +93,7 @@ The app should now be running at http://localhost:3000
 
 Use a tool like curl, Postman, or your browser. You must include the admin secret from your `.env.local` file:
 
+**Linux/macOS/WSL:**
 ```bash
 curl -X POST http://localhost:3000/api/users/create \
   -H "Content-Type: application/json" \
@@ -104,7 +105,25 @@ curl -X POST http://localhost:3000/api/users/create \
   }'
 ```
 
-**Important:** Replace the `x-admin-secret` value with your actual `ADMIN_SECRET` from `.env.local`
+**Windows PowerShell:**
+```powershell
+# Method 1: Using a JSON file (recommended)
+# Create user.json:
+# {
+#   "username": "admin",
+#   "password": "your-secure-password",
+#   "generateApiKey": true
+# }
+curl.exe -X POST http://localhost:3000/api/users/create -H "Content-Type: application/json" -H "x-admin-secret: ea37023ee63489d404831077185cd3c260561e837c6c317492ad5bafce792cf3" -d @user.json
+
+# Method 2: Using Invoke-RestMethod
+Invoke-RestMethod -Uri http://localhost:3000/api/users/create -Method POST -Headers @{"Content-Type"="application/json"; "x-admin-secret"="ea37023ee63489d404831077185cd3c260561e837c6c317492ad5bafce792cf3"} -Body '{"username": "admin", "password": "your-secure-password", "generateApiKey": true}'
+```
+
+**Important:**
+- Replace the `x-admin-secret` value with your actual `ADMIN_SECRET` from `.env.local`
+- In PowerShell, use `curl.exe` instead of `curl` to use the actual curl binary
+- WSL users: If running curl from WSL while the app is on Windows, use the Windows host IP instead of localhost
 
 The response will include:
 ```json
@@ -208,6 +227,7 @@ For production security, consider:
 
 To create more users, you must provide the admin secret:
 
+**Linux/macOS/WSL:**
 ```bash
 curl -X POST https://your-domain.vercel.app/api/users/create \
   -H "Content-Type: application/json" \
@@ -217,6 +237,15 @@ curl -X POST https://your-domain.vercel.app/api/users/create \
     "password": "secure-password",
     "generateApiKey": true
   }'
+```
+
+**Windows PowerShell:**
+```powershell
+# Using JSON file (recommended)
+curl.exe -X POST https://your-domain.vercel.app/api/users/create -H "Content-Type: application/json" -H "x-admin-secret: your-admin-secret-here" -d @user.json
+
+# Or using Invoke-RestMethod
+Invoke-RestMethod -Uri https://your-domain.vercel.app/api/users/create -Method POST -Headers @{"Content-Type"="application/json"; "x-admin-secret"="your-admin-secret-here"} -Body '{"username": "newuser", "password": "secure-password", "generateApiKey": true}'
 ```
 
 **Security Note:**

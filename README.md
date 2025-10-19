@@ -131,6 +131,60 @@ This app is designed to be deployed on Vercel:
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
 
+## Testing
+
+The application includes comprehensive test coverage for core functionality:
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode (for development)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Test Coverage
+
+The test suite includes:
+
+1. **Authentication Tests** (`__tests__/lib/auth.test.ts`)
+   - API key authentication
+   - Username/password authentication
+   - Invalid credentials handling
+   - Missing credentials handling
+
+2. **User Creation API Tests** (`__tests__/api/users.test.ts`)
+   - Admin secret authorization
+   - User creation with/without API keys
+   - Input validation
+   - Error handling
+
+3. **Mock API Serving Tests** (`__tests__/api/mock.test.ts`)
+   - Endpoint matching (method + path)
+   - API key validation for protected endpoints
+   - Response formatting (JSON, plain text)
+   - Custom status codes
+   - Database error handling
+
+4. **Component Tests** (`__tests__/components/EndpointTester.test.tsx`)
+   - UI rendering
+   - Request body input for POST/PUT/PATCH/DELETE
+   - API key input handling
+   - Response display
+   - Error handling
+   - Loading states
+
+### Test Framework
+
+- **Jest** - Testing framework
+- **React Testing Library** - Component testing
+- **@testing-library/jest-dom** - Custom matchers
+
 ## License
 
 MIT

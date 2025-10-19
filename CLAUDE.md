@@ -44,12 +44,22 @@ Access at http://localhost:3000
 
 ### Creating Users
 Users must be created via the API with the admin secret:
+
+**Linux/macOS/WSL:**
 ```bash
 curl -X POST http://localhost:3000/api/users/create \
   -H "Content-Type: application/json" \
   -H "x-admin-secret: your-admin-secret-from-env-file" \
   -d '{"username": "admin", "password": "secure-password", "generateApiKey": true}'
 ```
+
+**Windows PowerShell (using JSON file):**
+```powershell
+# Create a user.json file with your user data, then:
+curl.exe -X POST http://localhost:3000/api/users/create -H "Content-Type: application/json" -H "x-admin-secret: your-admin-secret-from-env-file" -d @user.json
+```
+
+**Note:** In PowerShell, use `curl.exe` instead of `curl` to use the actual curl binary. Alternatively, use a JSON file with `-d @filename` to avoid escaping issues.
 
 ## Architecture
 

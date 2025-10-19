@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
         // Otherwise, authenticate with username and password
         if (!credentials.username || !credentials.password) return null
 
-        const { data: user, error } = await supabase
+        const { data: user, error } = await supabaseAdmin
           .from('users')
           .select('*')
           .eq('username', credentials.username)

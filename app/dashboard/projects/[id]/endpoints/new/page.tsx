@@ -16,7 +16,11 @@ export default function NewEndpoint({ params }: { params: { id: string } }) {
 
     const formData = new FormData(e.currentTarget)
     const method = formData.get('method') as string
-    const path = formData.get('path') as string
+    let path = formData.get('path') as string
+    // Ensure path starts with a slash
+    if (!path.startsWith('/')) {
+      path = `/${path}`
+    }
     const response_body = formData.get('response_body') as string
     const status_code = parseInt(formData.get('status_code') as string)
     const requires_sub_key = formData.get('requires_sub_key') === 'on'
