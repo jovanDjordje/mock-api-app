@@ -4,6 +4,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key'
 
+// Log environment variable status (safe to log URLs, not keys)
+console.log('[SUPABASE] URL configured:', supabaseUrl !== 'https://placeholder.supabase.co')
+console.log('[SUPABASE] Anon key configured:', supabaseAnonKey !== 'placeholder-key')
+console.log('[SUPABASE] Service role key configured:', supabaseServiceRoleKey !== 'placeholder-service-key')
+console.log('[SUPABASE] URL:', supabaseUrl)
+
 // Client-side Supabase client (uses anon key, subject to RLS)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
