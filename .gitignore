@@ -28,6 +28,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# personal notes and learning materials
+*.local.md
+LEARNING-*.md
+
 # vercel
 .vercel
 
