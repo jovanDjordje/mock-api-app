@@ -4,6 +4,9 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { Shield, FolderTree, Zap, ArrowRight, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -18,49 +21,74 @@ export default function Home() {
   if (status === 'loading') {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </main>
     )
   }
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-gradient-to-b from-blue-50 to-white">
-      <div className="text-center max-w-3xl">
-        <h1 className="text-5xl font-bold mb-6 text-gray-900">Mock API App</h1>
-        <p className="text-xl text-gray-600 mb-8">
-          Create and manage custom mock API endpoints for development and testing
-        </p>
+  const features = [
+    {
+      icon: Shield,
+      title: 'Secure Authentication',
+      description: 'Username/password or API key authentication with optional endpoint-level security',
+    },
+    {
+      icon: FolderTree,
+      title: 'Project Organization',
+      description: 'Group your endpoints into projects for better management and organization',
+    },
+    {
+      icon: Zap,
+      title: 'Custom Responses',
+      description: 'Define custom JSON, XML, or text responses with configurable status codes',
+    },
+  ]
 
-        <div className="grid md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="text-3xl mb-3">🔐</div>
-            <h3 className="font-semibold text-lg mb-2">Secure Authentication</h3>
-            <p className="text-sm text-gray-600">
-              Username/password or API key authentication
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="text-3xl mb-3">📁</div>
-            <h3 className="font-semibold text-lg mb-2">Project Organization</h3>
-            <p className="text-sm text-gray-600">
-              Group your endpoints into projects
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="text-3xl mb-3">⚡</div>
-            <h3 className="font-semibold text-lg mb-2">Custom Responses</h3>
-            <p className="text-sm text-gray-600">
-              Define custom JSON, XML, or text responses
-            </p>
-          </div>
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10" />
+
+      <div className="text-center max-w-5xl mx-auto space-y-12">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <h1 className="text-6xl font-bold tracking-tight">
+            <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+              Mock API App
+            </span>
+          </h1>
+          <p className="text-2xl text-muted-foreground max-w-2xl mx-auto">
+            Create and manage custom mock API endpoints for development and testing with ease
+          </p>
         </div>
 
-        <Link
-          href="/auth/signin"
-          className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
-        >
-          Get Started
-        </Link>
+        <div className="grid md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+          {features.map((feature, index) => (
+            <Card
+              key={index}
+              className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            >
+              <CardHeader>
+                <div className="mb-4 inline-flex p-3 rounded-lg bg-primary/10">
+                  <feature.icon className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle className="text-xl">{feature.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  {feature.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
+          <Button size="lg" asChild className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all">
+            <Link href="/auth/signin" className="flex items-center gap-2">
+              Get Started
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
       </div>
     </main>
   )

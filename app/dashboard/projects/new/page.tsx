@@ -2,6 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { FolderPlus, Loader2, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default function NewProject() {
   const router = useRouter()
@@ -38,60 +45,83 @@ export default function NewProject() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Create New Project</h1>
-
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Project Name *
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="My API Project"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="A brief description of your project"
-            />
-          </div>
-
-          {error && (
-            <div className="text-red-600 text-sm">{error}</div>
-          )}
-
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Creating...' : 'Create Project'}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+    <div className="max-w-2xl space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Create New Project</h1>
+        <p className="text-muted-foreground mt-2">
+          Set up a new project to organize your mock API endpoints
+        </p>
       </div>
+
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FolderPlus className="h-5 w-5" />
+            Project Details
+          </CardTitle>
+          <CardDescription>
+            Enter the basic information for your new project
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">
+                Project Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                required
+                placeholder="My API Project"
+                autoFocus
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                rows={4}
+                placeholder="A brief description of your project (optional)"
+              />
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <Button type="submit" disabled={isLoading} className="flex-1 sm:flex-none">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <FolderPlus className="mr-2 h-4 w-4" />
+                    Create Project
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={isLoading}
+              >
+                <X className="mr-2 h-4 w-4" />
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

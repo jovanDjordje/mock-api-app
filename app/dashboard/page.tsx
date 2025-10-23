@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Project } from '@/lib/supabase'
+import { Plus, FolderOpen, Loader2, Calendar, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Dashboard() {
   const { data: session, status } = useSession()
@@ -41,7 +44,7 @@ export default function Dashboard() {
   if (status === 'loading' || isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-gray-600">Loading...</div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -51,49 +54,65 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">My Projects</h1>
-        <Link
-          href="/dashboard/projects/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          New Project
-        </Link>
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">My Projects</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your mock API projects and endpoints
+          </p>
+        </div>
+        <Button asChild size="lg" className="shadow-md">
+          <Link href="/dashboard/projects/new" className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            New Project
+          </Link>
+        </Button>
       </div>
 
       {projects.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">
-            No projects yet
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Create your first project to start adding mock API endpoints
-          </p>
-          <Link
-            href="/dashboard/projects/new"
-            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700"
-          >
-            Create Project
-          </Link>
-        </div>
+        <Card className="border-2 border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="rounded-full bg-muted p-6 mb-4">
+              <FolderOpen className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h2 className="text-2xl font-semibold mb-2">
+              No projects yet
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-sm">
+              Create your first project to start adding mock API endpoints for testing and development
+            </p>
+            <Button asChild size="lg">
+              <Link href="/dashboard/projects/new" className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Create Project
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
-            <Link
-              key={project.id}
-              href={`/dashboard/projects/${project.id}`}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-            >
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                {project.name}
-              </h2>
-              {project.description && (
-                <p className="text-gray-600 text-sm">{project.description}</p>
-              )}
-              <p className="text-gray-400 text-xs mt-4">
-                Created {new Date(project.created_at).toLocaleDateString()}
-              </p>
+            <Link key={project.id} href={`/dashboard/projects/${project.id}`}>
+              <Card className="h-full hover:shadow-lg hover:border-primary/50 transition-all duration-300 group">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between text-xl group-hover:text-primary transition-colors">
+                    <span className="truncate">{project.name}</span>
+                    <ChevronRight className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </CardTitle>
+                  {project.description && (
+                    <CardDescription className="line-clamp-2">
+                      {project.description}
+                    </CardDescription>
+                  )}
+                </CardHeader>
+                <CardFooter>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
+                    <span>Created {new Date(project.created_at).toLocaleDateString()}</span>
+                  </div>
+                </CardFooter>
+              </Card>
             </Link>
           ))}
         </div>

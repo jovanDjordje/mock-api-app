@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Project, Endpoint } from '@/lib/supabase'
 import { EndpointTester } from '@/components/EndpointTester'
+import { Plus, Trash2, Edit, ChevronLeft, Loader2, Network, Key } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -82,116 +87,148 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-gray-600">Loading...</div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
 
   if (!project) {
-    return <div>Project not found</div>
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <p className="text-muted-foreground">Project not found</p>
+        <Button variant="outline" asChild>
+          <Link href="/dashboard">
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </Button>
+      </div>
+    )
+  }
+
+  const getMethodBadgeVariant = (method: string) => {
+    switch (method) {
+      case 'GET': return 'default'
+      case 'POST': return 'default'
+      case 'PUT': return 'secondary'
+      case 'PATCH': return 'secondary'
+      case 'DELETE': return 'destructive'
+      default: return 'outline'
+    }
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <Link href="/dashboard" className="text-blue-600 hover:underline text-sm mb-2 block">
-            ← Back to Projects
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div className="space-y-1">
+          <Button variant="ghost" size="sm" asChild className="mb-2 -ml-2">
+            <Link href="/dashboard">
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Back to Projects
+            </Link>
+          </Button>
+          <h1 className="text-4xl font-bold tracking-tight">{project.name}</h1>
           {project.description && (
-            <p className="text-gray-600 mt-2">{project.description}</p>
+            <p className="text-muted-foreground text-lg">{project.description}</p>
           )}
         </div>
-        <div className="flex gap-2">
-          <Link
-            href={`/dashboard/projects/${params.id}/endpoints/new`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            New Endpoint
-          </Link>
-          <button
-            onClick={deleteProject}
-            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-          >
-            Delete Project
-          </button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button asChild className="flex-1 sm:flex-none">
+            <Link href={`/dashboard/projects/${params.id}/endpoints/new`}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Endpoint
+            </Link>
+          </Button>
+          <Button variant="destructive" onClick={deleteProject}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </Button>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">API Endpoints</h2>
-        </div>
-
-        {endpoints.length === 0 ? (
-          <div className="p-12 text-center">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              No endpoints yet
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Create your first endpoint to start mocking API responses
-            </p>
-            <Link
-              href={`/dashboard/projects/${params.id}/endpoints/new`}
-              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700"
-            >
-              Create Endpoint
-            </Link>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-200">
-            {endpoints.map((endpoint) => (
-              <div key={endpoint.id} className="p-6 hover:bg-gray-50">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded ${
-                        endpoint.method === 'GET' ? 'bg-green-100 text-green-800' :
-                        endpoint.method === 'POST' ? 'bg-blue-100 text-blue-800' :
-                        endpoint.method === 'PUT' ? 'bg-yellow-100 text-yellow-800' :
-                        endpoint.method === 'DELETE' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {endpoint.method}
-                      </span>
-                      <code className="text-sm font-mono text-gray-700">{endpoint.path}</code>
-                      {endpoint.requires_sub_key && (
-                        <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded">
-                          Requires Key
-                        </span>
-                      )}
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Network className="h-5 w-5" />
+            API Endpoints
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {endpoints.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+              <div className="rounded-full bg-muted p-6">
+                <Network className="h-12 w-12 text-muted-foreground" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">No endpoints yet</h3>
+                <p className="text-muted-foreground max-w-sm">
+                  Create your first endpoint to start mocking API responses
+                </p>
+              </div>
+              <Button asChild size="lg">
+                <Link href={`/dashboard/projects/${params.id}/endpoints/new`}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Endpoint
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {endpoints.map((endpoint, index) => (
+                <div key={endpoint.id}>
+                  {index > 0 && <Separator />}
+                  <div className="pt-4 first:pt-0">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge variant={getMethodBadgeVariant(endpoint.method)}>
+                            {endpoint.method}
+                          </Badge>
+                          <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
+                            {endpoint.path}
+                          </code>
+                          {endpoint.requires_sub_key && (
+                            <Badge variant="outline" className="gap-1">
+                              <Key className="h-3 w-3" />
+                              Requires Key
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Status: <span className="font-medium text-foreground">{endpoint.status_code}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/dashboard/projects/${params.id}/endpoints/${endpoint.id}`}>
+                            <Edit className="mr-1 h-3 w-3" />
+                            Edit
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteEndpoint(endpoint.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="mr-1 h-3 w-3" />
+                          Delete
+                        </Button>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      Status: <span className="font-medium">{endpoint.status_code}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/dashboard/projects/${params.id}/endpoints/${endpoint.id}`}
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => deleteEndpoint(endpoint.id)}
-                      className="text-red-600 hover:underline text-sm"
-                    >
-                      Delete
-                    </button>
+                    <EndpointTester
+                      projectId={params.id}
+                      method={endpoint.method}
+                      path={endpoint.path}
+                      requiresKey={endpoint.requires_sub_key}
+                    />
                   </div>
                 </div>
-                <EndpointTester
-                  projectId={params.id}
-                  method={endpoint.method}
-                  path={endpoint.path}
-                  requiresKey={endpoint.requires_sub_key}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
