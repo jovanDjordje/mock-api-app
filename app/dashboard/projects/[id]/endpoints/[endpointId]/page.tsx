@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import AiResponseGenerator from '@/components/AiResponseGenerator'
 
 export default function EditEndpoint({
   params
@@ -30,6 +31,8 @@ export default function EditEndpoint({
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
   const [method, setMethod] = useState('')
+  const [path, setPath] = useState('')
+  const [responseBody, setResponseBody] = useState('')
 
   useEffect(() => {
     fetchEndpoint()
@@ -42,6 +45,8 @@ export default function EditEndpoint({
         const data = await response.json()
         setEndpoint(data.endpoint)
         setMethod(data.endpoint.method)
+        setPath(data.endpoint.path)
+        setResponseBody(data.endpoint.response_body || '')
       }
     } catch (error) {
       console.error('Failed to fetch endpoint:', error)
@@ -56,12 +61,11 @@ export default function EditEndpoint({
     setIsSaving(true)
 
     const formData = new FormData(e.currentTarget)
-    let path = formData.get('path') as string
+    let endpointPath = path
     // Ensure path starts with a slash
-    if (!path.startsWith('/')) {
-      path = `/${path}`
+    if (!endpointPath.startsWith('/')) {
+      endpointPath = `/${endpointPath}`
     }
-    const response_body = formData.get('response_body') as string
     const status_code = parseInt(formData.get('status_code') as string)
     const requires_sub_key = formData.get('requires_sub_key') === 'on'
 
@@ -71,8 +75,8 @@ export default function EditEndpoint({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           method,
-          path,
-          response_body,
+          path: endpointPath,
+          response_body: responseBody,
           status_code,
           requires_sub_key,
         }),
@@ -184,7 +188,8 @@ export default function EditEndpoint({
                 name="path"
                 type="text"
                 required
-                defaultValue={endpoint.path}
+                value={path}
+                onChange={(e) => setPath(e.target.value)}
                 className="font-mono"
               />
               <p className="text-xs text-muted-foreground">
@@ -193,15 +198,23 @@ export default function EditEndpoint({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="response_body" className="flex items-center gap-1">
-                <Code className="h-3 w-3" />
-                Response Body
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="response_body" className="flex items-center gap-1">
+                  <Code className="h-3 w-3" />
+                  Response Body
+                </Label>
+                <AiResponseGenerator
+                  onAccept={(response) => setResponseBody(response)}
+                  currentMethod={method}
+                  currentPath={path}
+                />
+              </div>
               <Textarea
                 id="response_body"
                 name="response_body"
                 rows={12}
-                defaultValue={endpoint.response_body || ''}
+                value={responseBody}
+                onChange={(e) => setResponseBody(e.target.value)}
                 className="font-mono text-sm"
               />
               <p className="text-xs text-muted-foreground">

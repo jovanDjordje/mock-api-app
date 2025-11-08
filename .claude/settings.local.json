@@ -5,7 +5,8 @@
       "Bash(npm install)",
       "Bash(npm install next-auth @supabase/supabase-js bcryptjs)",
       "Bash(npm test)",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(npm install lucide-react)"
     ],
     "deny": [],
     "ask": []

@@ -17,12 +17,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import AiResponseGenerator from '@/components/AiResponseGenerator'
 
 export default function NewEndpoint({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [method, setMethod] = useState('GET')
+  const [path, setPath] = useState('')
+  const [responseBody, setResponseBody] = useState('')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -30,12 +33,11 @@ export default function NewEndpoint({ params }: { params: { id: string } }) {
     setIsLoading(true)
 
     const formData = new FormData(e.currentTarget)
-    let path = formData.get('path') as string
+    let endpointPath = path
     // Ensure path starts with a slash
-    if (!path.startsWith('/')) {
-      path = `/${path}`
+    if (!endpointPath.startsWith('/')) {
+      endpointPath = `/${endpointPath}`
     }
-    const response_body = formData.get('response_body') as string
     const status_code = parseInt(formData.get('status_code') as string)
     const requires_sub_key = formData.get('requires_sub_key') === 'on'
 
@@ -45,8 +47,8 @@ export default function NewEndpoint({ params }: { params: { id: string } }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           method,
-          path,
-          response_body,
+          path: endpointPath,
+          response_body: responseBody,
           status_code,
           requires_sub_key,
         }),
@@ -138,6 +140,8 @@ export default function NewEndpoint({ params }: { params: { id: string } }) {
                 required
                 placeholder="/api/users"
                 className="font-mono"
+                value={path}
+                onChange={(e) => setPath(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
                 The endpoint path (will automatically add / prefix if not present)
@@ -145,16 +149,25 @@ export default function NewEndpoint({ params }: { params: { id: string } }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="response_body" className="flex items-center gap-1">
-                <Code className="h-3 w-3" />
-                Response Body
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="response_body" className="flex items-center gap-1">
+                  <Code className="h-3 w-3" />
+                  Response Body
+                </Label>
+                <AiResponseGenerator
+                  onAccept={(response) => setResponseBody(response)}
+                  currentMethod={method}
+                  currentPath={path}
+                />
+              </div>
               <Textarea
                 id="response_body"
                 name="response_body"
                 rows={12}
                 placeholder='{"message": "Hello World"}'
                 className="font-mono text-sm"
+                value={responseBody}
+                onChange={(e) => setResponseBody(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
                 Paste your JSON, XML, or text response here
