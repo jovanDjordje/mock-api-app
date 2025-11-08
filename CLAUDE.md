@@ -11,6 +11,7 @@ Mock-API-App - A full-stack web application that allows users to create and mana
 - Project-based organization of endpoints
 - Custom API endpoint creation (GET, POST, PUT, PATCH, DELETE)
 - Custom response configuration (JSON, XML, or plain text)
+- **AI-powered response generation** using Google Gemini (describe what you want, AI generates realistic mock data)
 - Optional API sub-keys for endpoint-level security
 - In-browser endpoint testing
 - Free hosting on Vercel with Supabase database
@@ -33,6 +34,7 @@ npm install
 3. Run the SQL schema from `supabase/schema.sql` in Supabase SQL Editor
 4. Add your Supabase URL and anon key to `.env.local`
 5. Generate and add NEXTAUTH_SECRET to `.env.local`
+6. **(Optional)** Add GOOGLE_GEMINI_API_KEY to enable AI-powered response generation
 
 See [SETUP.md](SETUP.md) for detailed setup instructions.
 
@@ -67,13 +69,16 @@ curl.exe -X POST http://localhost:3000/api/users/create -H "Content-Type: applic
 - **Frontend/Backend**: Next.js 14 (App Router) with TypeScript
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: NextAuth.js with credentials provider
+- **AI Integration**: Google Gemini 2.0 Flash (optional, for response generation)
+- **UI Components**: shadcn/ui with Tailwind CSS
 - **Styling**: Tailwind CSS
 - **Deployment**: Vercel
 
 ### Key Directories
 - `/app` - Next.js App Router pages and API routes
-- `/components` - React components
+- `/components` - React components and UI elements
 - `/lib` - Utility functions and configurations
+- `/lib/ai` - AI provider abstraction and integrations
 - `/supabase` - Database schema and migrations
 - `/types` - TypeScript type definitions
 
@@ -88,6 +93,7 @@ curl.exe -X POST http://localhost:3000/api/users/create -H "Content-Type: applic
 - `/api/users/create` - User creation (protected with ADMIN_SECRET)
 - `/api/projects` - Project CRUD operations
 - `/api/projects/[id]/endpoints` - Endpoint CRUD operations
+- `/api/ai/generate-response` - AI-powered response generation (requires authentication)
 - `/api/mock/[projectId]/[...path]` - Dynamic route for serving mock endpoints
 
 ### Request Flow
@@ -116,5 +122,24 @@ See [SETUP.md](SETUP.md) for Vercel deployment instructions.
 - `/api/users/create` is protected with ADMIN_SECRET environment variable
 - Set proper NEXTAUTH_URL for production
 - Add ADMIN_SECRET to Vercel environment variables
+- **(Optional)** Add GOOGLE_GEMINI_API_KEY to Vercel to enable AI response generation
 - Consider enabling Supabase Row Level Security (RLS)
 - All environment variables must be configured in Vercel
+
+### AI-Powered Response Generation
+
+The app includes optional AI-powered mock response generation:
+- Click "Generate with AI ✨" button in endpoint creation/edit forms
+- Describe what you want in natural language
+- AI generates realistic JSON, XML, or plain text responses
+- Preview and approve before using
+
+**Setup:**
+1. Get a free API key from https://aistudio.google.com/app/apikey
+2. Add `GOOGLE_GEMINI_API_KEY` to `.env.local` (local) or Vercel (production)
+3. If not configured, the "Generate with AI" button won't appear
+
+**Architecture:**
+- Extensible provider system in `/lib/ai`
+- Currently uses Google Gemini 2.0 Flash
+- Easy to add other providers (OpenAI, Claude, Ollama, etc.)
